@@ -1,0 +1,70 @@
+.calendar-wrapper {
+    min-height: 100vh;
+    background-color: #0f172a;
+    color: white;
+}
+
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+}
+
+.calendar-title {
+    font-size: 48px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.react-calendar {
+    width: 700px !important;
+    max-width: 100%;
+    background: white !important;
+    border: none !important;
+    border-radius: 15px;
+    padding: 20px;
+    color: black;
+    font-size: 18px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.3);
+}
+
+.react-calendar__navigation button {
+    color: black;
+    font-size: 18px;
+    min-width: 44px;
+    background: none;
+}
+
+.react-calendar__month-view__weekdays {
+    text-align: center;
+    font-weight: bold;
+    color: black;
+}
+
+.react-calendar__tile {
+    height: 70px;
+    color: black;
+    border-radius: 10px;
+}
+
+.react-calendar__tile--active {
+    background: #4F46E5 !important;
+    color: white !important;
+}
+
+.booking-heading {
+    margin-top: 30px;
+    font-size: 28px;
+    color: white;
+}
+
+.booking-card {
+    background: white;
+    color: black;
+    width: 350px;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.2);
+}

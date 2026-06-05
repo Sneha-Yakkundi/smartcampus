@@ -1,0 +1,37 @@
+.react-calendar {
+
+    width: 100%;
+
+    border: none;
+
+    font-family: Arial;
+
+}
+
+.react-calendar__tile {
+
+    color: black !important;
+
+    height: 50px;
+
+}
+
+.react-calendar__month-view__days__day {
+
+    color: black !important;
+
+}
+
+.react-calendar__navigation button {
+
+    color: black !important;
+
+    font-size: 16px;
+
+}
+
+.react-calendar__month-view__weekdays {
+
+    color: black !important;
+
+}
