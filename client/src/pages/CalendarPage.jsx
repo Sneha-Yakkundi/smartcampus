@@ -42,23 +42,28 @@ function CalendarPage({ darkMode, setDarkMode }) {
     }, []);
 
     // FORMAT DATE
-    const selectedDate = date.toLocaleDateString("en-CA");
+    const selectedDate =
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(date.getDate()).padStart(2, "0");
 
     // FILTER BOOKINGS
     const filteredBookings = bookings.filter((booking) => {
 
-    const bookingDate = new Date(booking.date);
+        const bookingDate = new Date(booking.date);
 
-    const formattedBookingDate =
-        bookingDate.getFullYear() +
-        "-" +
-        String(bookingDate.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(bookingDate.getDate()).padStart(2, "0");
+        const formattedBookingDate =
+            bookingDate.getFullYear() +
+            "-" +
+            String(bookingDate.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(bookingDate.getDate()).padStart(2, "0");
 
-    return formattedBookingDate === selectedDate;
+        return formattedBookingDate === selectedDate;
 
-});
+    });
 
     return (
 
