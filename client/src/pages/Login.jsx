@@ -35,7 +35,7 @@ function Login({ darkMode, setDarkMode }) {
 
             const res = await axios.post(
 
-                "http://localhost:5000/api/auth/login",
+                "https://smartcampus-h5xz.onrender.com",
 
                 formData
 
