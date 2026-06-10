@@ -39,17 +39,27 @@ function BookingCalendar({ darkMode, setDarkMode }) {
     }, []);
 
     const formattedDate =
-    date.getFullYear() +
-    "-" +
-    String(date.getMonth() + 1).padStart(2, "0") +
-    "-" +
-    String(date.getDate()).padStart(2, "0");
-    
-    const selectedDateBookings = bookings.filter(
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(date.getDate()).padStart(2, "0");
 
-        (booking) => booking.date === formattedDate
+    // FIXED DATE FILTERING
+    const selectedDateBookings = bookings.filter((booking) => {
 
-    );
+        const bookingDate = new Date(booking.date);
+
+        const formattedBookingDate =
+            bookingDate.getFullYear() +
+            "-" +
+            String(bookingDate.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(bookingDate.getDate()).padStart(2, "0");
+
+        return formattedBookingDate === formattedDate;
+
+    });
 
     return (
 
