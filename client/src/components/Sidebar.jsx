@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
 import {
     FaTachometerAlt,
@@ -12,13 +13,16 @@ import {
     FaSun
 } from "react-icons/fa";
 
+import { AuthContext } from "../context/AuthContext";
+
 function Sidebar({ darkMode, setDarkMode }) {
 
     const navigate = useNavigate();
+    const { logout, user } = useContext(AuthContext);
 
-    const logout = () => {
+    const handleLogout = () => {
 
-        localStorage.clear();
+        logout();
 
         navigate("/");
 
@@ -99,7 +103,7 @@ function Sidebar({ darkMode, setDarkMode }) {
                 </Link>
 
                 {
-                    localStorage.getItem("role") === "admin" && (
+                    user?.role === "admin" && (
 
                         <>
 
@@ -165,7 +169,7 @@ function Sidebar({ darkMode, setDarkMode }) {
                 </button>
 
                 <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="bg-red-500 hover:bg-red-600 p-3 rounded-lg mt-10 flex items-center gap-3 transition duration-300"
                 >
 

@@ -11,10 +11,13 @@ function Register({ darkMode, setDarkMode }) {
         name: "",
         email: "",
         password: "",
-        adminKey: ""
+        adminKey: "",
+        facultyKey: "",
+        department: ""
     });
 
     const [showAdminKey, setShowAdminKey] = useState(false);
+    const [showFacultyKey, setShowFacultyKey] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -26,7 +29,7 @@ function Register({ darkMode, setDarkMode }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Build payload - only send adminKey if provided
+        // Build payload
         const payload = {
             name: formData.name,
             email: formData.email,
@@ -35,6 +38,14 @@ function Register({ darkMode, setDarkMode }) {
 
         if (showAdminKey && formData.adminKey) {
             payload.adminKey = formData.adminKey;
+        }
+
+        if (showFacultyKey && formData.facultyKey) {
+            payload.facultyKey = formData.facultyKey;
+        }
+
+        if (formData.department) {
+            payload.department = formData.department;
         }
 
         try {
@@ -46,6 +57,8 @@ function Register({ darkMode, setDarkMode }) {
             toast.success(
                 response.data.user.role === "admin"
                     ? "Admin account created successfully!"
+                    : response.data.user.role === "faculty"
+                    ? "Faculty account created successfully!"
                     : "Student account created successfully!"
             );
 
@@ -124,6 +137,66 @@ function Register({ darkMode, setDarkMode }) {
                         }`}
                     />
 
+                    {/* Department Selection */}
+                    <select
+                        name="department"
+                        value={formData.department}
+                        onChange={handleChange}
+                        className={`w-full p-3 mb-4 rounded transition-colors ${
+                            darkMode
+                                ? "bg-slate-700 text-white"
+                                : "bg-gray-100 text-black"
+                        }`}
+                    >
+                        <option value="">Select Department (Optional)</option>
+                        <option value="CSE">CSE - Computer Science</option>
+                        <option value="ECE">ECE - Electronics</option>
+                        <option value="Mechanical">Mechanical Engineering</option>
+                    </select>
+
+                    {/* Faculty Key Toggle */}
+                    <div className={`mb-4 p-3 rounded transition-colors ${
+                        darkMode
+                            ? "bg-slate-700"
+                            : "bg-gray-100"
+                    }`}>
+                        <label className={`flex items-center cursor-pointer ${
+                            darkMode
+                                ? "text-gray-300"
+                                : "text-gray-700"
+                        }`}>
+                            <input
+                                type="checkbox"
+                                checked={showFacultyKey}
+                                onChange={(e) => setShowFacultyKey(e.target.checked)}
+                                className="mr-2 w-4 h-4"
+                            />
+                            Register as Faculty (Optional)
+                        </label>
+                        <p className={`text-xs mt-1 ${
+                            darkMode
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                        }`}>
+                            Faculty get higher booking priority
+                        </p>
+                    </div>
+
+                    {showFacultyKey && (
+                        <input
+                            type="password"
+                            name="facultyKey"
+                            placeholder="Faculty Secret Key"
+                            value={formData.facultyKey}
+                            onChange={handleChange}
+                            className={`w-full p-3 mb-4 rounded border-2 transition-colors border-orange-500 ${
+                                darkMode
+                                    ? "bg-slate-600 text-white placeholder-gray-400"
+                                    : "bg-orange-50 text-black placeholder-orange-700"
+                            }`}
+                        />
+                    )}
+
                     {/* Admin Key Toggle */}
                     <div className={`mb-4 p-3 rounded transition-colors ${
                         darkMode
@@ -152,7 +225,6 @@ function Register({ darkMode, setDarkMode }) {
                         </p>
                     </div>
 
-                    {/* Admin Key Input - Show only if toggled */}
                     {showAdminKey && (
                         <input
                             type="password"
@@ -177,12 +249,13 @@ function Register({ darkMode, setDarkMode }) {
 
                 </form>
 
-                <p className={`text-center mt-4 text-sm ${
+                <p className={`text-center mt-4 text-xs ${
                     darkMode
                         ? "text-gray-400"
                         : "text-gray-600"
                 }`}>
-                    By default, all new users register as <span className="text-cyan-400 font-bold">Students</span>.
+                    By default: <span className="text-cyan-400 font-bold">Student</span> | 
+                    Faculty Key: faculty123 | Admin Key: admin123
                 </p>
 
                 <p className={`text-center mt-4 ${

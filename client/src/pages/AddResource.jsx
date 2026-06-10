@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 import Navbar from "../components/Navbar";
 
 function AddResource({ darkMode, setDarkMode }) {
@@ -25,16 +25,9 @@ function AddResource({ darkMode, setDarkMode }) {
 
         try {
 
-            const token = localStorage.getItem("token");
-
-            await axios.post(
-                "http://localhost:5000/api/resources",
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+            await API.post(
+                "/resources",
+                formData
             );
 
             alert("Resource Added");

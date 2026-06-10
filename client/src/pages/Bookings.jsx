@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../services/api";
+import { toast } from "react-toastify";
 
 import Sidebar from "../components/Sidebar";
 
@@ -16,14 +17,8 @@ function Bookings({ darkMode, setDarkMode }) {
 
         try {
 
-            const res = await axios.get(
-                "http://localhost:5000/api/bookings",
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${localStorage.getItem("token")}`
-                    }
-                }
+            const res = await API.get(
+                "/bookings"
             );
 
             setBookings(res.data);
@@ -40,23 +35,17 @@ function Bookings({ darkMode, setDarkMode }) {
 
         try {
 
-            await axios.post(
-                "http://localhost:5000/api/bookings",
+            await API.post(
+                "/bookings",
                 {
                     resourceId,
                     date,
                     startTime,
                     endTime
-                },
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${localStorage.getItem("token")}`
-                    }
                 }
             );
 
-            alert("Booking Created Successfully");
+            toast.success("Booking Created Successfully - Pending Admin Approval");
 
             setResourceId("");
             setDate("");
@@ -69,10 +58,25 @@ function Bookings({ darkMode, setDarkMode }) {
 
             console.log(err);
 
-            alert("Booking Failed");
+            toast.error(err.response?.data?.error || "Booking Failed");
 
         }
 
+    };
+
+    const cancelBooking = async (bookingId) => {
+        try {
+            await API.put(
+                `/bookings/${bookingId}/cancel`
+            );
+
+            toast.success("Booking cancelled successfully");
+            fetchBookings();
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Failed to cancel booking");
+        }
     };
 
     useEffect(() => {
@@ -181,10 +185,14 @@ function Bookings({ darkMode, setDarkMode }) {
 
                         <div
                             key={booking.id}
-                            className={`p-6 rounded-2xl shadow-lg transition-colors ${
+                            className={`p-6 rounded-2xl shadow-lg transition-colors border-l-4 ${
                                 darkMode
                                     ? "bg-slate-800"
                                     : "bg-white"
+                            } ${
+                                booking.approvalStatus === "approved" ? "border-green-500" :
+                                booking.approvalStatus === "rejected" ? "border-red-500" :
+                                "border-yellow-500"
                             }`}
                         >
 
@@ -192,32 +200,52 @@ function Bookings({ darkMode, setDarkMode }) {
                                 Booking #{booking.id}
                             </h2>
 
-                            <p className="mb-2">
-                                <strong>Resource ID:</strong>{" "}
-                                {booking.resourceId}
-                            </p>
+                            <div className="space-y-2 mb-4">
+                                <p className="mb-2">
+                                    <strong>Resource:</strong>{" "}
+                                    {booking.Resource?.name || "Unknown"}
+                                </p>
 
-                            <p className="mb-2">
-                                <strong>Date:</strong>{" "}
-                                {booking.date}
-                            </p>
+                                <p className="mb-2">
+                                    <strong>Date:</strong>{" "}
+                                    {booking.date}
+                                </p>
 
-                            <p className="mb-2">
-                                <strong>Start:</strong>{" "}
-                                {booking.startTime}
-                            </p>
+                                <p className="mb-2">
+                                    <strong>Time:</strong>{" "}
+                                    {booking.startTime} - {booking.endTime}
+                                </p>
 
-                            <p className="mb-2">
-                                <strong>End:</strong>{" "}
-                                {booking.endTime}
-                            </p>
+                                <div className="flex gap-2">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                        booking.approvalStatus === "approved" ? "bg-green-500 text-white" :
+                                        booking.approvalStatus === "rejected" ? "bg-red-500 text-white" :
+                                        "bg-yellow-500 text-white"
+                                    }`}>
+                                        {booking.approvalStatus?.toUpperCase()}
+                                    </span>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                        booking.priority === 2 ? "bg-orange-500" : "bg-blue-500"
+                                    } text-white`}>
+                                        {booking.priority === 2 ? "FACULTY" : "STUDENT"}
+                                    </span>
+                                </div>
 
-                            <p>
-                                <strong>Status:</strong>{" "}
-                                <span className="text-orange-400 font-bold">
-                                    {booking.status}
-                                </span>
-                            </p>
+                                {booking.adminNotes && (
+                                    <p className="text-xs mt-2 p-2 bg-slate-700 rounded">
+                                        <strong>Admin Notes:</strong> {booking.adminNotes}
+                                    </p>
+                                )}
+                            </div>
+
+                            {booking.approvalStatus !== "cancelled" && (
+                                <button
+                                    onClick={() => cancelBooking(booking.id)}
+                                    className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded transition"
+                                >
+                                    Cancel Booking
+                                </button>
+                            )}
 
                         </div>
 

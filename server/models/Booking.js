@@ -49,10 +49,7 @@ const Booking = sequelize.define("Booking", {
         defaultValue: 1  // 1 = student (default), 2 = faculty (higher priority) - for feature 7
     },
 
-    qrCode: {
-        type: DataTypes.TEXT("long")
-    },
-
+   
     adminNotes: {
         type: DataTypes.TEXT,
         allowNull: true  // Admin notes for approval/rejection

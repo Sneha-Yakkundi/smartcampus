@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
 
 function Login({ darkMode, setDarkMode }) {
 
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
 
@@ -39,9 +41,8 @@ function Login({ darkMode, setDarkMode }) {
 
             );
 
-            localStorage.setItem("token", res.data.token);
-
-            localStorage.setItem("role", res.data.user.role);
+            // Use AuthContext login function to update state AND localStorage
+            login(res.data.user, res.data.token);
 
             toast.success("Login Successful");
 

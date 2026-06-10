@@ -2,11 +2,21 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+console.log("EMAIL_USER =", process.env.EMAIL_USER);
+console.log("EMAIL_PASS =", process.env.EMAIL_PASS ? "FOUND" : "MISSING");
 const sequelize = require("./config/database");
 
-require("./models/User");
-require("./models/Resource");
-require("./models/Booking");
+// MODELS
+const User = require("./models/User");
+const Resource = require("./models/Resource");
+const Booking = require("./models/Booking");
+
+// ASSOCIATIONS
+Booking.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Booking, { foreignKey: "userId" });
+
+Booking.belongsTo(Resource, { foreignKey: "resourceId" });
+Resource.hasMany(Booking, { foreignKey: "resourceId" });
 
 const authRoutes = require("./routes/authRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
@@ -17,18 +27,15 @@ const availabilityRoutes = require("./routes/availabilityRoutes");
 const app = express();
 
 const http = require("http");
-
 const server = http.createServer(app);
 
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
-
     cors: {
         origin: "http://localhost:5173",
         methods: ["GET", "POST"]
     }
-
 });
 
 app.use(cors());

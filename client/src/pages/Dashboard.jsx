@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 import Sidebar from "../components/Sidebar";
+import API from "../services/api";
 
 function Dashboard({ darkMode, setDarkMode }) {
+
+    const navigate = useNavigate();
+    const { isAuthenticated, loading } = useContext(AuthContext);
 
     const [stats, setStats] = useState({
 
@@ -18,8 +23,8 @@ function Dashboard({ darkMode, setDarkMode }) {
 
         try {
 
-            const res = await axios.get(
-                "http://localhost:5000/api/dashboard/stats"
+            const res = await API.get(
+                "/dashboard/stats"
             );
 
             setStats(res.data);
@@ -33,10 +38,13 @@ function Dashboard({ darkMode, setDarkMode }) {
     };
 
     useEffect(() => {
-
+        if (!loading && !isAuthenticated) {
+            navigate("/");
+            return;
+        }
         fetchStats();
 
-    }, []);
+    }, [isAuthenticated, loading, navigate]);
 
     return (
 

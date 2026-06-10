@@ -3,7 +3,6 @@ const sendEmail = require("../utils/sendEmail");
 const User = require("../models/User");
 const Resource = require("../models/Resource");
 const io = require("../server");
-const QRCode = require("qrcode");
 const { Op } = require("sequelize");
 
 
@@ -94,11 +93,7 @@ exports.createBooking = async (req, res) => {
         });
 
         // GENERATE QR CODE WITH BOOKING ID
-        const qrData = `Booking ID: ${booking.id}\nDate: ${date}\nTime: ${startTime} - ${endTime}`;
-        const qrCode = await QRCode.toDataURL(qrData);
-
-        booking.qrCode = qrCode;
-        await booking.save();
+        
 
         // SEND EMAIL
         await sendEmail(
@@ -107,9 +102,11 @@ exports.createBooking = async (req, res) => {
             `Your booking for resource ${resource.name} is pending admin approval.\nDate: ${date}\nTime: ${startTime} - ${endTime}`
         );
 
-        io.emit("newBooking", {
-            message: "New booking created and pending approval"
-        });
+        if (io && typeof io.emit === "function") {
+    io.emit("newBooking", {
+        message: "New booking created and pending approval"
+    });
+}
 
         res.json({
             message: "Booking created successfully and is pending approval",
@@ -274,8 +271,6 @@ exports.cancelBooking = async (req, res) => {
     }
 
 }
-
-};
 
 
 // UPDATE BOOKING STATUS

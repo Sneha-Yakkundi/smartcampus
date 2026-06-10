@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 
 import Sidebar from "../components/Sidebar";
 
@@ -13,22 +13,14 @@ function CreateResource({ darkMode, setDarkMode }) {
 
         try {
 
-            const token = localStorage.getItem("token");
+            await API.post(
 
-            await axios.post(
-
-                "http://localhost:5000/api/resources",
+                "/resources",
 
                 {
                     name,
                     type,
                     location
-                },
-
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
                 }
 
             );

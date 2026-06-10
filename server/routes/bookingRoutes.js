@@ -7,15 +7,23 @@ const {
     createBooking,
     getBookings,
     cancelBooking,
-    updateBookingStatus
+    updateBookingStatus,
+    getPendingBookings,
+    approveBooking,
+    rejectBooking
 } = require("../controllers/bookingController");
 
 
 // CREATE BOOKING
 router.post("/", authMiddleware, createBooking);
 
-// GET BOOKINGS
+// GET BOOKINGS (user's bookings)
 router.get("/", authMiddleware, getBookings);
+
+// FEATURE 5: ADMIN APPROVAL WORKFLOW
+router.get("/pending", authMiddleware, getPendingBookings);
+router.put("/:bookingId/approve", authMiddleware, approveBooking);
+router.put("/:bookingId/reject", authMiddleware, rejectBooking);
 
 // CANCEL BOOKING
 router.put("/:id/cancel", authMiddleware, cancelBooking);

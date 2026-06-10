@@ -1,17 +1,23 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 function ProtectedRoute({ children, role }) {
 
-    const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("role");
+    const { isAuthenticated, user, loading } = useContext(AuthContext);
+    const location = useLocation();
 
-    if (!token) {
+    if (loading) {
+        return <div className="flex items-center justify-center min-h-screen text-white text-xl">Loading authentication...</div>;
+    }
 
-        return <Navigate to="/" />;
+    if (!isAuthenticated) {
+
+        return <Navigate to="/" state={{ from: location }} />;
 
     }
 
-    if (role && role !== userRole) {
+    if (role && role !== user?.role) {
 
         return <Navigate to="/dashboard" />;
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../services/api";
 
 import Sidebar from "../components/Sidebar";
 
@@ -16,15 +16,8 @@ function Resources({ darkMode, setDarkMode }) {
 
         try {
 
-            const token = localStorage.getItem("token");
-
-            const res = await axios.get(
-                "http://localhost:5000/api/resources",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+            const res = await API.get(
+                "/resources"
             );
 
             setResources(res.data);

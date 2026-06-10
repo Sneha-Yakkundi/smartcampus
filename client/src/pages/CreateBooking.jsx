@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 
 import Sidebar from "../components/Sidebar";
 
@@ -41,23 +41,15 @@ function CreateBooking({ darkMode, setDarkMode }) {
 
             setLoading(true);
 
-            const token = localStorage.getItem("token");
+            const response = await API.post(
 
-            const response = await axios.post(
-
-                "http://localhost:5000/api/bookings",
+                "/bookings",
 
                 {
                     resourceId,
                     date,
                     startTime,
                     endTime
-                },
-
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
                 }
 
             );

@@ -201,3 +201,92 @@ exports.deleteResource = async (req, res) => {
         res.status(500).json(err);
     }
 };
+
+// FEATURE 1: AI-BASED RESOURCE RECOMMENDATION
+exports.getRecommendedResources = async (req, res) => {
+    try {
+        const { date, startTime, endTime, capacity, type, department } = req.query;
+        const userId = req.user.id;
+
+        if (!date || !startTime || !endTime) {
+            return res.status(400).json({ error: "date, startTime, and endTime are required" });
+        }
+
+        // Step 1: Find all available resources matching filters
+        let whereClause = { status: "available" };
+        
+        if (type) whereClause.type = type;
+        if (department) whereClause.department = department;
+        if (capacity) whereClause.capacity = { [Op.gte]: parseInt(capacity) };
+
+        let availableResources = await Resource.findAll({ where: whereClause });
+
+        // Step 2: Filter out resources with time conflicts
+        const bookedResources = await Booking.findAll({
+            where: {
+                date: date,
+                startTime: { [Op.lt]: endTime },
+                endTime: { [Op.gt]: startTime },
+                approvalStatus: "approved"
+            }
+        });
+
+        const bookedResourceIds = bookedResources.map(b => b.resourceId);
+        availableResources = availableResources.filter(r => !bookedResourceIds.includes(r.id));
+
+        // Step 3: Score each resource based on AI logic
+        const scoredResources = await Promise.all(
+            availableResources.map(async (resource) => {
+                let score = 100;  // Base score
+
+                // Factor 1: Less occupied resources get higher score (-10 for each booking)
+                const totalBookings = await Booking.count({
+                    where: { resourceId: resource.id, approvalStatus: "approved" }
+                });
+                score -= (totalBookings * 10);
+
+                // Factor 2: Capacity match (prefer resources with capacity closer to need)
+                if (capacity) {
+                    const capacityDiff = Math.abs(resource.capacity - parseInt(capacity));
+                    score -= (capacityDiff * 2);  // Penalize oversized resources
+                }
+
+                // Factor 3: User's previous bookings in this resource (+20 points - user is familiar)
+                const userPreviousBookings = await Booking.count({
+                    where: { resourceId: resource.id, userId: userId }
+                });
+                if (userPreviousBookings > 0) {
+                    score += 20;
+                }
+
+                // Factor 4: Department match (+15 if matching user's department)
+                if (department && resource.department === department) {
+                    score += 15;
+                }
+
+                // Factor 5: Building proximity (prefer building B over A, etc - simplified)
+                // This could be enhanced with actual location data
+
+                return {
+                    ...resource.toJSON(),
+                    recommendationScore: score,
+                    reason: score >= 100 ? "Excellent choice - less occupied" : 
+                           score >= 80 ? "Good availability" :
+                           "Available but higher demand"
+                };
+            })
+        );
+
+        // Step 4: Sort by recommendation score
+        scoredResources.sort((a, b) => b.recommendationScore - a.recommendationScore);
+
+        res.json({
+            message: "Recommended resources based on availability and usage",
+            count: scoredResources.length,
+            resources: scoredResources.slice(0, 5)  // Return top 5 recommendations
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

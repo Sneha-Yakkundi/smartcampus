@@ -1,13 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
 import { FaMoon, FaSun, FaPlusCircle } from "react-icons/fa";
+import { AuthContext } from "../context/AuthContext";
 
 function Navbar({ darkMode, setDarkMode }) {
 
     const navigate = useNavigate();
+    const { logout, user } = useContext(AuthContext);
 
-    const logout = () => {
+    const handleLogout = () => {
 
-        localStorage.clear();
+        logout();
 
         navigate("/");
 
@@ -60,7 +63,7 @@ function Navbar({ darkMode, setDarkMode }) {
                 Analytics
             </Link>
 
-            {localStorage.getItem("role") === "admin" && (
+            {user?.role === "admin" && (
                 <>
                     <Link
                         to="/admin"
@@ -91,7 +94,7 @@ function Navbar({ darkMode, setDarkMode }) {
             </button>
 
             <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 text-white transition"
             >
                 Logout

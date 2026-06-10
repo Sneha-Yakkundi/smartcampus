@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
 
     try {
 
-        const { name, email, password, adminKey } = req.body;
+        const { name, email, password, adminKey, facultyKey, department } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({
@@ -24,15 +24,17 @@ exports.register = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Determine role: Check if valid admin key is provided
-        let userRole = "student"; // Default role - ALWAYS student unless admin key matches
+        // Determine role: Check if valid keys are provided
+        let userRole = "student"; // Default role
         
         if (adminKey && adminKey === process.env.ADMIN_SECRET_KEY) {
             userRole = "admin";
-        } else if (adminKey) {
-            // Invalid admin key provided
+        } else if (facultyKey && facultyKey === process.env.FACULTY_SECRET_KEY) {
+            userRole = "faculty";
+        } else if (adminKey || facultyKey) {
+            // Invalid keys provided
             return res.status(403).json({
-                message: "Invalid admin key. Registration failed."
+                message: "Invalid credentials. Registration failed."
             });
         }
 
@@ -41,7 +43,8 @@ exports.register = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role: userRole
+            role: userRole,
+            department: department || null
         });
 
         // Return success response
@@ -51,7 +54,8 @@ exports.register = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                department: user.department
             }
         });
 
@@ -74,15 +78,26 @@ exports.login = async (req, res) => {
 
         const { email, password } = req.body;
 
+        console.log("Login attempt for:", email);
+
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password required"
+            });
+        }
+
         const user = await User.findOne({
             where: { email }
         });
 
         if (!user) {
+            console.log("User not found:", email);
             return res.status(400).json({
                 message: "User not found"
             });
         }
+
+        console.log("User found, comparing passwords");
 
         const isMatch = await bcrypt.compare(
             password,
@@ -90,10 +105,13 @@ exports.login = async (req, res) => {
         );
 
         if (!isMatch) {
+            console.log("Password mismatch for user:", email);
             return res.status(400).json({
                 message: "Invalid credentials"
             });
         }
+
+        console.log("Password matched, generating token");
 
         const token = jwt.sign(
             { id: user.id },
@@ -101,8 +119,10 @@ exports.login = async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        // ✅ REPLACE RESPONSE HERE
+        console.log("Token generated successfully for user:", email);
+
         res.json({
+            message: "Login successful",
             token,
             user: {
                 id: user.id,
@@ -114,7 +134,10 @@ exports.login = async (req, res) => {
 
     } catch (err) {
 
+        console.error("Login error:", err);
+
         res.status(500).json({
+            message: "Server error",
             error: err.message
         });
 

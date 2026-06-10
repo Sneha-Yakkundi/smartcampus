@@ -8,7 +8,8 @@ const {
     getResourceAvailability,
     setMaintenanceStatus,
     getResourceById,
-    deleteResource
+    deleteResource,
+    getRecommendedResources
 } = require("../controllers/resourceController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -19,6 +20,9 @@ router.get("/", authMiddleware, getResources);
 
 // FEATURE 1: SEARCH AND FILTER
 router.get("/search", authMiddleware, searchResources);
+
+// FEATURE 1: AI RECOMMENDATIONS
+router.get("/recommendations/smart", authMiddleware, getRecommendedResources);
 
 // FEATURE 2: GET AVAILABILITY SLOTS
 router.get("/availability", authMiddleware, getResourceAvailability);

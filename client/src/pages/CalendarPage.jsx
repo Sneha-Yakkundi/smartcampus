@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import axios from "axios";
+import API from "../services/api";
 
 import Calendar from "react-calendar";
 
@@ -16,20 +16,13 @@ function CalendarPage({ darkMode, setDarkMode }) {
 
     const [bookings, setBookings] = useState([]);
 
-    const token = localStorage.getItem("token");
-
     // FETCH BOOKINGS
     const fetchBookings = async () => {
 
         try {
 
-            const res = await axios.get(
-                "http://localhost:5000/api/bookings",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+            const res = await API.get(
+                "/bookings"
             );
 
             setBookings(res.data);

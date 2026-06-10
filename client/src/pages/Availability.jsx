@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 
 import Sidebar from "../components/Sidebar";
 
@@ -15,9 +15,9 @@ function Availability({ darkMode, setDarkMode }) {
 
         try {
 
-            const res = await axios.get(
+            const res = await API.get(
 
-                `http://localhost:5000/api/availability?date=${date}&startTime=${startTime}&endTime=${endTime}`
+                `/availability?date=${date}&startTime=${startTime}&endTime=${endTime}`
 
             );
 
