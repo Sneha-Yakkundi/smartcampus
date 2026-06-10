@@ -50,7 +50,7 @@ function Register({ darkMode, setDarkMode }) {
 
         try {
             const response = await axios.post(
-                "https://smartcampus-h5xz.onrender.com",
+                "https://smartcampus-h5xz.onrender.com/api/auth/register",
                 payload
             );
 
