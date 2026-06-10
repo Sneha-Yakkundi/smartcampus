@@ -12,26 +12,47 @@ import {
 } from "recharts";
 
 import Sidebar from "../components/Sidebar";
+import { useState, useEffect } from "react";
+import API from "../services/api";
 
 function Analytics({ darkMode, setDarkMode }) {
-    const bookingData = [
 
-        {
-            name: "Pending",
-            value: 5
-        },
+    const [bookingData, setBookingData] = useState([]);
 
-        {
-            name: "Approved",
-            value: 12
-        },
+    useEffect(() => {
 
-        {
-            name: "Rejected",
-            value: 2
-        }
+        const fetchAnalytics = async () => {
 
-    ];
+            try {
+
+                const res = await API.get("/dashboard/analytics");
+
+                setBookingData([
+                    {
+                        name: "Pending",
+                        value: res.data.pending
+                    },
+                    {
+                        name: "Approved",
+                        value: res.data.approved
+                    },
+                    {
+                        name: "Rejected",
+                        value: res.data.rejected
+                    }
+                ]);
+
+            } catch (err) {
+
+                console.log(err);
+
+            }
+
+        };
+
+        fetchAnalytics();
+
+    }, []);
 
     const resourceData = [
 
@@ -70,9 +91,9 @@ function Analytics({ darkMode, setDarkMode }) {
         <div className="flex bg-slate-950 min-h-screen text-white">
 
             <Sidebar
-    darkMode={darkMode}
-    setDarkMode={setDarkMode}
-/>
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+            />
 
             <div className="ml-64 p-10 w-full">
 
