@@ -45,11 +45,20 @@ function CalendarPage({ darkMode, setDarkMode }) {
     const selectedDate = date.toLocaleDateString("en-CA");
 
     // FILTER BOOKINGS
-    const filteredBookings = bookings.filter(
+    const filteredBookings = bookings.filter((booking) => {
 
-        (booking) => booking.date === selectedDate
+    const bookingDate = new Date(booking.date);
 
-    );
+    const formattedBookingDate =
+        bookingDate.getFullYear() +
+        "-" +
+        String(bookingDate.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(bookingDate.getDate()).padStart(2, "0");
+
+    return formattedBookingDate === selectedDate;
+
+});
 
     return (
 
